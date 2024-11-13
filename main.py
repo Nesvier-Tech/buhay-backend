@@ -43,12 +43,18 @@ async def directions(start: str, end: str) -> DirectionsResponse:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No safe route found.",
             )
-    except ValueError:
+
+    except ValueError as e:
         # Handle specific exceptions with a 400 Bad Request
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid request.",
         )
+
+    except HTTPException as e:
+        # Re-raise HTTPExceptions
+        raise e
+
     except Exception as e:
         # Handle unexpected server errors with a 500 Internal Server Error
         raise HTTPException(
