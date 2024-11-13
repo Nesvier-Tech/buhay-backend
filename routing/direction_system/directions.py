@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from routing.models import RouteInfo
+from models import RouteInfo
 
 from routing.global_variables import calculate_geodesic_distance
 from routing.direction_system.directions_computation import (

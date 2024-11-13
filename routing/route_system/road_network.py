@@ -38,7 +38,7 @@ async def get_road_network(
 
     # Get the road network graph
     bbox = (north, south, east, west)
-    G = ox.graph_from_bbox(north, south, east, west, network_type="walk", simplify=True)
+    G = ox.graph_from_bbox(bbox=bbox, network_type="walk", simplify=True)
 
     # Compute the flood risk for each node
     await compute_flood_risk(G, list(G.nodes))

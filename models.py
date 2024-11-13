@@ -2,11 +2,6 @@ from pydantic import BaseModel
 from typing import List, Tuple
 
 
-class RouteRequest(BaseModel):
-    start: str
-    end: str
-
-
 class RouteInfo(BaseModel):
     instruction: str
     distance: float  # Distance in kilometers

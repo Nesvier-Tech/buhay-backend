@@ -2,7 +2,7 @@ from typing import List, Tuple
 import networkx as nx
 import osmnx as ox
 
-from routing.models import RouteInfo
+from models import RouteInfo
 from routing.global_variables import calculate_geodesic_distance
 from routing.route_system.road_network import get_road_network
 from routing.route_system.weight import weight_function
