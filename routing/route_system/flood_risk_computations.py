@@ -9,6 +9,7 @@ import osmnx as ox
 from routing.global_variables import (
     get_flood_index,
     get_flooded_areas,
+    FLOOD_WEIGHTS,
 )
 
 MAX_EFFECT_DISTANCE = 0.01  # About 1km in degrees
@@ -46,13 +47,7 @@ def calculate_flood_risk(point: Tuple[float, float]) -> float:
     flood_index = get_flood_index()
     flooded_areas = get_flooded_areas()
 
-    # Make this dynamic based on the file_name
-    # Placeholder for flood weights
-    flood_weights = {
-        "coordinates1.json": 1,
-        "coordinates2.json": 2,
-        "coordinates3.json": 3,
-    }
+    flood_weights = FLOOD_WEIGHTS
 
     # Initialize variables for nearby areas, distances, closest distances, and risk
     nearby_areas = {}

@@ -14,6 +14,12 @@ ROAD_NETWORK_CACHE = {}
 HIGH_EXPOSURE_THRESHOLD = 900  # 300 meters of flood exposure to risk 3
 MEDIUM_EXPOSURE_THRESHOLD = 450  # 150 meters of flood exposure to risk 3
 
+FLOOD_WEIGHTS = {
+    "1": 1,
+    "2": 2,
+    "3": 3,
+}
+
 
 def get_flood_index():
     global FLOOD_INDEX
