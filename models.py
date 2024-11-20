@@ -16,4 +16,5 @@ class Route(BaseModel):
 
 class DirectionsResponse(BaseModel):
     route: Route
+    geojson: dict
     message: str = None

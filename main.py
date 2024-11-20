@@ -4,6 +4,7 @@ from typing import AsyncGenerator
 
 
 from routing.load_data import load_flooded_areas
+from routing.geojson import create_geojson
 from models import Route, DirectionsResponse
 from routing.main_routing import compute_best_route_from_request
 
@@ -26,6 +27,8 @@ async def directions(start: str, end: str) -> DirectionsResponse:
             await compute_best_route_from_request(start, end)
         )
 
+        geojson = create_geojson(route_coordinates)
+
         if duration_minutes:
             # Return the directions response
             return DirectionsResponse(
@@ -35,6 +38,7 @@ async def directions(start: str, end: str) -> DirectionsResponse:
                     coordinates=route_coordinates,
                     routeInfo=route_info,
                 ),
+                geojson=geojson,
                 message="Safe route found.",
             )
         else:
