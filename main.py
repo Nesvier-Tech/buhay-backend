@@ -1,12 +1,14 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
 from typing import AsyncGenerator
+import json
 
 
 from routing.load_data import load_flooded_areas
 from routing.geojson import create_geojson
 from models import Route, DirectionsResponse
 from routing.main_routing import compute_best_route_from_request
+from routing.cache_database import write_to_database
 
 
 # Load the flooded areas on startup
@@ -23,15 +25,25 @@ app = FastAPI(lifespan=startup_event)
 @app.get("/directions", status_code=status.HTTP_200_OK)
 async def directions(start: str, end: str) -> DirectionsResponse:
     try:
-        duration_minutes, total_distance_km, route_coordinates, route_info = (
-            await compute_best_route_from_request(start, end)
-        )
+        (
+            hashed_id,
+            duration_minutes,
+            total_distance_km,
+            route_coordinates,
+            route_info,
+            route_data,
+        ) = await compute_best_route_from_request(start, end)
+
+        if route_data:
+            route_data = DirectionsResponse.model_validate(route_data)
+            return route_data
 
         geojson = create_geojson(route_coordinates)
 
         if duration_minutes:
-            # Return the directions response
-            return DirectionsResponse(
+            # Write the route to the cache database
+
+            route_data = DirectionsResponse(
                 route=Route(
                     duration=duration_minutes,
                     distanceKm=total_distance_km,
@@ -41,6 +53,13 @@ async def directions(start: str, end: str) -> DirectionsResponse:
                 geojson=geojson,
                 message="Safe route found.",
             )
+
+            write_to_database(
+                hashed_id,
+                route_data.model_dump_json(),
+            ),
+
+            return route_data
         else:
             # Return an error message if no safe route is found
             raise HTTPException(
