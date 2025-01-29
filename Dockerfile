@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.13
 
 # Install GDAL and other dependencies required by fiona
 RUN apt-get update && apt-get install -y \

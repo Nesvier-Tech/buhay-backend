@@ -1,5 +1,4 @@
 import asyncpg
-from fastapi import FastAPI
 import json
 
 from db_env import (

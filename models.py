@@ -20,6 +20,13 @@ class DirectionsResponse(BaseModel):
     message: str = None
 
 
+class DirectionsRequest(BaseModel):
+    # Format: "lng,lat"
+    # Example: "121.07471,14.66651"
+    start: str
+    end: str
+
+
 class Point(BaseModel):
     location_name: str | None
     coordinates: Tuple[float, float]
