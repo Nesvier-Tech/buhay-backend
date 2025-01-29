@@ -1,4 +1,5 @@
 fastapi[standard]
+asyncpg
 aiofiles
 psycopg2 # Needs postgresql to be installed (in mac).
 aiofiles

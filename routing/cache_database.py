@@ -1,4 +1,5 @@
-import psycopg2
+import asyncpg
+from fastapi import FastAPI
 import json
 
 from db_env import (
@@ -10,47 +11,45 @@ from db_env import (
     DB_CACHE_TABLE_NAME,
 )
 
-
-def connect_to_database():
-    try:
-        # Replace these values with your actual database credentials
-        connection = psycopg2.connect(
-            dbname=DB_CACHE_NAME,
-            user=DB_CACHE_USER,
-            password=DB_CACHE_PASSWORD,
-            host=DB_CACHE_HOST,
-            port=DB_CACHE_PORT,
-        )
-
-        return connection
-
-    except Exception as error:
-        print("Error connecting to the database.")
+# Global variable for the connection pool
+connection_pool = None
 
 
-def read_database(hashed_id: str) -> json:
-    connection = connect_to_database()
+async def connect_to_database():
+    global connection_pool
+    connection_pool = await asyncpg.create_pool(
+        database=DB_CACHE_NAME,
+        user=DB_CACHE_USER,
+        password=DB_CACHE_PASSWORD,
+        host=DB_CACHE_HOST,
+        port=DB_CACHE_PORT,
+    )
 
-    cursor = connection.cursor()
 
-    cursor.execute(f"SELECT * FROM {DB_CACHE_TABLE_NAME} WHERE id=%s;", (hashed_id,))
-    db_data = cursor.fetchall()
+async def close_database_connection():
+    await connection_pool.close()
 
-    cursor.close()
-    connection.close()
 
+async def read_database(hashed_id: str):
+    async with connection_pool.acquire() as connection:
+        async with connection.transaction():
+            db_data = await connection.fetchrow(
+                f"SELECT * FROM {DB_CACHE_TABLE_NAME} WHERE id=$1;", hashed_id
+            )
+            if db_data:
+                db_data = db_data[1:][0]
+                # convert db_data to json
+                db_data = json.loads(db_data)
+            else:
+                db_data = []
     return db_data
 
 
-def write_to_database(hashed_id, route):
-    connection = connect_to_database()
-    cursor = connection.cursor()
-
-    cursor.execute(
-        f"INSERT INTO {DB_CACHE_TABLE_NAME} (id, route) VALUES (%s, %s);",
-        (hashed_id, route),
-    )
-
-    connection.commit()
-    cursor.close()
-    connection.close()
+async def write_to_database(hashed_id, route):
+    async with connection_pool.acquire() as connection:
+        async with connection.transaction():
+            await connection.execute(
+                f"INSERT INTO {DB_CACHE_TABLE_NAME} (id, route) VALUES ($1, $2);",
+                hashed_id,
+                route,
+            )
