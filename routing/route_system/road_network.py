@@ -1,6 +1,8 @@
 from typing import Tuple, List
 import networkx as nx
 import osmnx as ox
+import concurrent.futures
+import asyncio
 
 from routing.global_variables import (
     get_road_network_cache,
@@ -29,7 +31,7 @@ async def get_road_network(
 
     # Calculate the bounding box for the road network
     distance = calculate_geodesic_distance(start, end)
-    buffer = min(0.015, distance * 0.1)
+    buffer = min(0.001, distance * 0.1)
 
     north = max(start[0], end[0]) + buffer
     south = min(start[0], end[0]) - buffer
@@ -38,7 +40,11 @@ async def get_road_network(
 
     # Get the road network graph
     bbox = (west, south, east, north)
-    G = ox.graph_from_bbox(bbox=bbox, network_type="walk", simplify=True)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        G = await asyncio.get_event_loop().run_in_executor(
+            executor,
+            lambda: ox.graph_from_bbox(bbox, network_type="walk", simplify=True),
+        )
 
     # Compute the flood risk for each node
     await compute_flood_risk(G, list(G.nodes))

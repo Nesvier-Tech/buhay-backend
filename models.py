@@ -10,8 +10,8 @@ class RouteInfo(BaseModel):
 class Route(BaseModel):
     duration: float
     distanceKm: float
-    coordinates: List[List[float]]
-    routeInfo: List[RouteInfo]
+    # coordinates: List[List[float]]
+    # routeInfo: List[RouteInfo]
 
 
 class DirectionsResponse(BaseModel):
