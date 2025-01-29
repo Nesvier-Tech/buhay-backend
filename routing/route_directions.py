@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import HTTPException, status
 import time
 
 from routing.geojson import create_geojson
@@ -8,10 +8,7 @@ from routing.cache_database import (
     write_to_database,
 )
 
-router = APIRouter()
 
-
-@router.post("/directions", status_code=status.HTTP_200_OK)
 async def directions(directionRequest: DirectionsRequest) -> DirectionsResponse:
     start_time = time.time()
     try:
