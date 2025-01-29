@@ -27,7 +27,6 @@ app = FastAPI(lifespan=startup_event)
 # Include router for tsp endpoint
 app.include_router(main_tsp.router)
 
-
 # app.include_router(route_directions.router)
 @app.post("/directions", status_code=status.HTTP_200_OK)
 async def call_directions(directionRequest: DirectionsRequest):

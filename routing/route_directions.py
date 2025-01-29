@@ -8,7 +8,6 @@ from routing.cache_database import (
     write_to_database,
 )
 
-
 async def directions(directionRequest: DirectionsRequest) -> DirectionsResponse:
     start_time = time.time()
     try:
