@@ -2,7 +2,7 @@ from osmnx.distance import great_circle
 from typing import List
 
 from models import Point
-from naive_tsp.structs import Node, Graph, Path, Coordinates
+from tests.naive_tsp.structs import Node, Graph, Path, Coordinates
 
 
 

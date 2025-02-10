@@ -3,8 +3,8 @@ from fastapi.params import Body
 from typing import List
 
 from models import TSPinput
-from naive_tsp.structs import Graph, Path, Coordinates
-from naive_tsp.utils import naive_create_graph, min_hamiltonian_paths, path_to_json_parser
+from tests.naive_tsp.structs import Graph, Path, Coordinates
+from tests.naive_tsp.utils import naive_create_graph, min_hamiltonian_paths, path_to_json_parser
 
 
 
