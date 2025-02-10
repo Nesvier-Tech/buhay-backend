@@ -10,11 +10,11 @@ from main import app, startup_event
 from models import Point, TSPinput
 
 from random import randint
-import time
+from time import time
 
 @pytest.mark.asyncio
 async def test_tsp():
-    start = time.time()
+    start = time()
     async with startup_event(app):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             request = client.build_request(url="/tsp", method="GET", 
@@ -28,7 +28,7 @@ async def test_tsp():
                 }
             )
             response = await client.send(request)
-        end = time.time()
+        end = time()
         print("TIME TAKEN: ", end-start)
         # print(response.json())
         assert response.json() == [
@@ -40,7 +40,7 @@ async def test_tsp():
 
 def generate_points(n: int) -> TSPinput:
     start: Point = {"coordinates": [randint(0, 100_000), randint(0, 100_000)]}
-    other_points: list[Point] = list()
+    other_points: List[Point] = list()
     for i in range(n-1):
         lat = float(randint(0, 100_000))
         lng = float(randint(0, 100_000))
@@ -56,18 +56,18 @@ def generate_points(n: int) -> TSPinput:
 async def test_time():
     test_cases = 1000
     n = 6
-    total_start = time.time()
+    total_start = time()
     for i in range(test_cases):
         body = generate_points(n)
         # print(body)
-        start = time.time()
+        # start = time()
         async with startup_event(app):
             async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
                 request = client.build_request(url="/tsp", method="GET", json=body)
                 response = await client.send(request)
-            end = time.time()
+            # end = time()
             # print(response.json())
             # print(f"RANDOM TEST {i+1} TIME TAKEN: ", end-start)
-    total_end = time.time()
+    total_end = time()
     print(f"TIME TAKEN FOR n={n} {test_cases} TEST CASES: ", total_end-total_start)
     print(f"AVERAGE TIME FOR n={n} {test_cases} TEST CASES: ", (total_end-total_start)/test_cases)
