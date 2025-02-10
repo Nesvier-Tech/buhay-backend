@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 
 @dataclass
 class Node:
@@ -40,3 +40,5 @@ class Graph:
     
     def get_node(self, i: int) -> Node:
         return list(filter(lambda n : n.i == i, self._nodes))[0]
+
+Path = Tuple[float, List[Node]] # total distance, nodes

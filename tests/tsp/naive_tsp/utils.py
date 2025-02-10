@@ -2,7 +2,7 @@ from osmnx.distance import great_circle
 from typing import List
 
 from models import Point
-from naive_tsp.structs import Graph
+from naive_tsp.structs import Node, Graph, Path
 
 
 
@@ -38,3 +38,33 @@ def naive_create_graph(points: List[Point]) -> Graph:
     return G
 
 
+def h_paths(G: Graph, start: Node, visited: dict[Node, bool], distance_to_start: float = 0) -> List[Path]:
+    """
+    Get all single-source hamiltonian paths _naively_ using dynamic programming.
+    Hopefully this is reasonably slow lang.
+    """
+
+    visited[start] = True
+
+    if all(visited):
+        visited[start] = False
+        return [(distance_to_start, [start])]
+
+    paths: List[Path] = []
+
+    # Get adjacent edges.
+    connected_edges = list(filter((
+            lambda edge : edge.i == start.i 
+            and not visited[G.get_node(edge.j)]
+        ), G.edges
+    ))
+
+    # Add starting node to paths from its adjacent nodes.
+    for edge in connected_edges:
+        adj = h_paths(G, G.get_node(edge.j), visited, distance_to_start + edge.weight)
+        for distance_to_adj, adj_path in adj:
+            paths += [(distance_to_adj, [start] + adj_path)]
+
+    visited[start] = False
+
+    return paths
