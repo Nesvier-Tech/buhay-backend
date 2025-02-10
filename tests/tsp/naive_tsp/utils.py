@@ -2,7 +2,7 @@ from osmnx.distance import great_circle
 from typing import List
 
 from models import Point
-from naive_tsp.structs import Node, Graph, Path
+from naive_tsp.structs import Node, Graph, Path, Coordinates
 
 
 
@@ -83,3 +83,18 @@ def min_hamiltonian_paths(G: Graph) -> List[Path]:
 
     # Return a list of paths.
     return shortest_paths
+
+
+def path_to_json_parser(G: Graph, path: Path) -> List[dict[str, Coordinates]]:
+    # Get the order of nodes in the path.
+    _, node_path = path
+
+    # Get all points in node_path and make them JSONable.
+    # Type should be dict[str, Any] pero since one attribute lang naman, make it strict na.
+    point_path: List[dict[str, Coordinates]] = [
+        Point(coordinates=(node.lat, node.lng)).model_dump(mode='json')
+        for node in node_path
+    ]
+
+    # Return a JSONable dict of a list of points.
+    return point_path
