@@ -30,7 +30,7 @@ async def naive_tsp(points: TSPinput) -> List[dict[str, Coordinates]]:
         tsp_route: Path = min_hamiltonian_paths(G)[0]
 
         # Return a JSONable dict of a list of points.
-        return path_to_json_parser(G, tsp_route)
+        return path_to_json_parser(tsp_route)
     
     except ValueError as e:
         # Handle specific exceptions with a 400 Bad Request
