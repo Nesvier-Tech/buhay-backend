@@ -68,3 +68,18 @@ def h_paths(G: Graph, start: Node, visited: dict[Node, bool], distance_to_start:
     visited[start] = False
 
     return paths
+
+
+def min_hamiltonian_paths(G: Graph) -> List[Path]:
+    # Get all minimum hamiltonian paths given a starting node.
+    start_node = G.nodes[0] # Added the starting point kanina as the first node in the graph.
+    all_paths: List[Path] = h_paths(G, start_node, {n: False for n in G.nodes})
+
+    # Get the shortest distance among all paths.
+    shortest_distance = min(all_paths, key=lambda p : p[0])[0]
+
+    # Get all paths with the shortest distance; at best, there's just one path.
+    shortest_paths = list(filter(lambda p : p[0] == shortest_distance, all_paths))
+
+    # Return a list of paths.
+    return shortest_paths
