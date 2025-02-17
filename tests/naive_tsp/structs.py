@@ -17,9 +17,9 @@ class Graph:
     """
     Represents a complete, weighted, directed graph
     """
-    def __init__(self, nodes: List[Node] = [], edges: List[Edge] = []):
-        self._nodes = nodes
-        self._edges = edges
+    def __init__(self):
+        self._nodes: List[Node] = []
+        self._edges: List[Edge] = []
 
     @property
     def nodes(self):
