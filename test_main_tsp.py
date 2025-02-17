@@ -76,35 +76,50 @@ async def test_time():
     print(f"TIME TAKEN FOR n={n} {test_cases} TEST CASES: ", total_end-total_start)
     print(f"AVERAGE TIME FOR n={n} {test_cases} TEST CASES: ", (total_end-total_start)/test_cases)
 
+
+
+async def tsp_case(inp: TSPinput):
+    async with startup_event(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as tsp_client:
+            request = tsp_client.build_request(url="/tsp", method="GET", json=inp)
+            tsp_response = await tsp_client.send(request)
+
+        tsp_json = tsp_response.json()
+        print(f'/tsp: {tsp_json}')
+        print()
+    
+    return tsp_json
+
+
+async def naive_tsp_case(inp: TSPinput):
+    async with startup_event(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as naive_tsp_client:
+            request = naive_tsp_client.build_request(url="/naive_tsp", method="GET", json=inp)
+            naive_tsp_response = await naive_tsp_client.send(request)
+
+        naive_tsp_json = naive_tsp_response.json()
+        print(f'/naive_tsp: {naive_tsp_json}')
+        print()
+
+    return naive_tsp_json
+
+
 @pytest.mark.asyncio
 async def test_correctness():
     test_cases = 10 # The brute force solver might be very, very slow
-    n = 6
 
     print(f'Testing Correctness...')
     total_start = time()
+
     for i in range(test_cases):
-        body = generate_points(n)
-        # print(body)
+        n = 6
+        inp = generate_points(n)
+        print(f'{i}: {inp}')
+        print()
 
-        async with startup_event(app):
-            tsp_start = time()
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as tsp_client:
-                request = tsp_client.build_request(url="/tsp", method="GET", json=body)
-                tsp_response = await tsp_client.send(request)
-            tsp_end = time()
-            # print(tsp_response.json())
-            print(f'Test {i + 1}, /tsp: {tsp_end - tsp_start}')
-
-            naive_tsp_start = time()
-            async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as naive_tsp_client:
-                request = naive_tsp_client.build_request(url="/naive_tsp", method="GET", json=body)
-                naive_tsp_response = await naive_tsp_client.send(request)
-            naive_tsp_end = time()
-            # print(naive_tsp_response.json())
-            print(f'Test {i + 1}, /naive_tsp: {naive_tsp_end - naive_tsp_start}')
-
-            assert(tsp_response.json() == naive_tsp_response.json())
+        tsp_result = await tsp_case(inp)
+        naive_tsp_result = await naive_tsp_case(inp)
+        assert(tsp_result == naive_tsp_result)
 
     total_end = time()
 
