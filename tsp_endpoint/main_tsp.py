@@ -1,15 +1,17 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Body
 
-from models import Point, TSPinput
+from models import Point, TSPinput, DirectionsRequest, DirectionsResponse
+from routing.route_directions import directions
 from tsp_endpoint.auxiliary_functions import create_graph, append_starting_node, node_to_json_parser
 import networkx as nx
 from typing import List
 
+
 router = APIRouter()
 
-@router.get("/tsp", status_code = status.HTTP_200_OK)
-async def tsp(points: TSPinput) -> List[Point]:
+@router.post("/tsp", status_code = status.HTTP_200_OK)
+async def tsp(points: TSPinput):
     try:
         # Convert input points into a complete, weighted, directed graph, in which the weights of the edges are the haversine distance between the adjacent vertices.
         G: nx.Graph = create_graph([points.start] + points.other_points)
@@ -29,9 +31,24 @@ async def tsp(points: TSPinput) -> List[Point]:
         tsp_route = node_to_json_parser(G, tsp_route)
         
         # Connect the starting node to the closest end of the shortest hamiltonian path.
-        #tsp_route = append_starting_node(tsp_route, points.start)
+        # tsp_route = append_starting_node(tsp_route, points.start)
 
-        return tsp_route
+        dir = []
+        for pt in range(1, len(tsp_route)):
+            req = DirectionsRequest(
+                start=f'{tsp_route[pt]["coordinates"][0]}, {tsp_route[pt]["coordinates"][1]}', 
+                end=f'{tsp_route[pt - 1]["coordinates"][0]}, {tsp_route[pt - 1]["coordinates"][1]}'
+            )
+            
+            to_append = {
+                'start': tsp_route[pt - 1]['coordinates'],
+                'end': tsp_route[pt]['coordinates'],
+                'data': await directions(req)
+            }
+
+            dir.append(to_append)
+
+        return dir
     
     except nx.NetworkXError as e:
         raise HTTPException(
