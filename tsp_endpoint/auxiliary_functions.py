@@ -46,8 +46,8 @@ def append_starting_node(tsp_route: List[Point], start: Point) -> List[Point]:
 
     return complete_tsp
 
-def node_to_json_parser(G: nx.Graph, nodes: List[int]) -> List[Point]:
-    ret: List[Point] = []
+def node_to_json_parser(G: nx.Graph, nodes: List[int]) -> List[dict[str, List[float]]]:
+    ret: List[dict[str, List[float]]] = []
     for node in nodes:
         ret.append({
             "coordinates": [G.nodes[node]["lng"], G.nodes[node]["lat"]]
