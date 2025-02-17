@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, status
-from fastapi.params import Body
 from typing import List
 
 from models import TSPinput
