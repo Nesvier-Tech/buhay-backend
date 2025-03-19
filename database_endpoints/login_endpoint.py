@@ -7,9 +7,8 @@ import json
 
 router = APIRouter()
 
-@router.get("/login", status_code = status.HTTP_200_OK)
+@router.post("/login", status_code = status.HTTP_200_OK)
 async def login(login_input: LoginInput):
-    # return
     try:
         db_data = await search_login(login_input.username, login_input.password)
         
@@ -24,8 +23,7 @@ async def login(login_input: LoginInput):
                 "person_id": 0,
                 "access_control": 0
             }
-    # except:
-    #     ...
+        
     except ValueError as e:
         # Handle specific exceptions with a 400 Bad Request
         raise HTTPException(
