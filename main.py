@@ -108,8 +108,8 @@ async def add_request(input: AddRequestInput):
         lng, lat = point.coordinates[0], point.coordinates[1]
         raw_coordinates.append({"coordinates": [lng, lat]})
         coordinate_names.append(gmaps.reverse_geocode((lat, lng), result_type="street_address")[0]["formatted_address"])
-    db_data = await add_request_row(person_id, raw_coordinates, coordinate_names)
-    return {"returned": db_data}
+    request_id = await add_request_row(person_id, raw_coordinates, coordinate_names)
+    return {"request_id": request_id}
 
 @app.post("/get_route_info", status_code=status.HTTP_200_OK)
 async def get_route_info(route_id: RouteInfo):

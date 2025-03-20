@@ -73,17 +73,14 @@ async def add_request_row(constituent_id: int, raw_coordinates: list[Point], coo
     table = "dispatcher_data"
     async with connection_pool.acquire() as connection:
         async with connection.transaction():
-            db_data = await connection.fetchval(
+            request_id = await connection.fetchval(
                 f"INSERT INTO {table} (coordinate_names, constituent_id, rescued, raw_coordinates) VALUES ($1, $2, $3, $4) RETURNING request_id;", 
                 json.dumps({"location_names": coordinate_names}),
                 constituent_id,
                 False,
                 json.dumps({"raw_coordinates": raw_coordinates})
             )
-    print("DBDATA")
-    pprint(db_data)
-    pprint("DBDATA END")
-    return db_data
+    return request_id
 
 async def route_info(route_id: str):
     table = "route_info"
