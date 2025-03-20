@@ -13,10 +13,17 @@ from routing.cache_database import (
     connect_to_database,
     close_database_connection,
     search_login,
+    add_request_row,
     route_info,
     update_rescued_boolean,
 )
-from models import Point, LoginInput, RouteInfo, UpdateRescued
+from models import (
+    Point, 
+    LoginInput, 
+    AddRequestInput,
+    RouteInfo, 
+    UpdateRescued
+)
 from qc_coordinates import check_point_in_polygon
 from own_websocket import own_socket
 from db_env import GOOGLE_MAPS_API
@@ -92,11 +99,22 @@ async def convert_coordinates(points: list[Point]):
         location_names.append(gmaps.reverse_geocode((lat, lng), result_type="street_address")[0]["formatted_address"])
     return {"locations": location_names}
 
+@app.post("/add_request", status_code=status.HTTP_200_OK)
+async def add_request(input: AddRequestInput):
+    person_id: int = input.person_id
+    raw_coordinates = list()
+    coordinate_names = list()
+    for point in input.coordinates:
+        lng, lat = point.coordinates[0], point.coordinates[1]
+        raw_coordinates.append({"coordinates": [lng, lat]})
+        coordinate_names.append(gmaps.reverse_geocode((lat, lng), result_type="street_address")[0]["formatted_address"])
+    db_data = await add_request_row(person_id, raw_coordinates, coordinate_names)
+    return {"returned": db_data}
+
 @app.post("/get_route_info", status_code=status.HTTP_200_OK)
 async def get_route_info(route_id: RouteInfo):
     data = await route_info(route_id.route_id)
     return {"payload": data}
-
 
 @app.post("/update_rescued", status_code=status.HTTP_200_OK)
 async def update_rescued(request_id: UpdateRescued):

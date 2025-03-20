@@ -1,5 +1,6 @@
 import asyncpg
 import json
+from pprint import pprint
 
 from db_env import (
     DB_CACHE_NAME,
@@ -9,6 +10,8 @@ from db_env import (
     DB_CACHE_PORT,
     DB_CACHE_TABLE_NAME,
 )
+
+from models import Point
 
 # Global variable for the connection pool
 connection_pool = None
@@ -55,17 +58,32 @@ async def write_to_database(hashed_id, route):
 
 
 async def search_login(username: str, password: str):
-    people_table = "people"
+    table = "people"
     async with connection_pool.acquire() as connection:
         async with connection.transaction():
             db_data = await connection.fetchrow(
-                f"SELECT person_id, access_control FROM {people_table} WHERE username = $1 AND password = $2",
+                f"SELECT person_id, access_control FROM {table} WHERE username = $1 AND password = $2",
                 username,
                 password,
             )
     print(db_data)
     return db_data
 
+async def add_request_row(constituent_id: int, raw_coordinates: list[Point], coordinate_names: list[str]):
+    table = "dispatcher_data"
+    async with connection_pool.acquire() as connection:
+        async with connection.transaction():
+            db_data = await connection.fetchval(
+                f"INSERT INTO {table} (coordinate_names, constituent_id, rescued, raw_coordinates) VALUES ($1, $2, $3, $4) RETURNING request_id;", 
+                json.dumps({"location_names": coordinate_names}),
+                constituent_id,
+                False,
+                json.dumps({"raw_coordinates": raw_coordinates})
+            )
+    print("DBDATA")
+    pprint(db_data)
+    pprint("DBDATA END")
+    return db_data
 
 async def route_info(route_id: str):
     table = "route_info"

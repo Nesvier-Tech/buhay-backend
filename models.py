@@ -42,6 +42,11 @@ class LoginInput(BaseModel):
     password: str
 
 
+class AddRequestInput(BaseModel):
+    person_id: int
+    coordinates: List[Point]
+
+
 class RouteInfo(BaseModel):
     route_id: int
 
