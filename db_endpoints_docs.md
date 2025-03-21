@@ -205,14 +205,14 @@ Given a starting point `start: Point` and some other points `other_points: List[
                 "start": "M25C+MQJ, 20 Ilocos Sur, Bago Bantay, Lungsod Quezon, 1105 Kalakhang Maynila, Philippines",
                 "end": "301 San Antonio, Quezon City, Metro Manila, Philippines",
                 "data": {
-                    // Very long
+                    // Very long data
                 }
             },
             {
                 "start": "301 San Antonio, Quezon City, Metro Manila, Philippines",
                 "end": "Chemical Engineering Laboratory, Magsaysay Ave, Diliman, Quezon City, 1101 Metro Manila, Philippines",
                 "data": {
-                    // Very long Data
+                    // Very long data
                 }
             }
         ]
