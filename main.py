@@ -15,6 +15,7 @@ from routing.cache_database import (
     search_login,
     add_request_row,
     add_route_info_row,
+    update_route_info_id,
     route_info,
     update_rescued_boolean,
 )
@@ -22,7 +23,7 @@ from models import (
     Point, 
     LoginInput, 
     AddRequestInput,
-    TSPinput,
+    SaveRouteInput,
     RouteInfo, 
     UpdateRescued
 )
@@ -117,11 +118,9 @@ async def add_request(input: AddRequestInput):
     return {"request_id": request_id}
 
 @app.post("/save_route", status_code=status.HTTP_200_OK)
-async def save_route(input: TSPinput):
+async def save_route(input: SaveRouteInput):
     try:
-        tsp_output = await tsp(input)
-        # print(tsp_output)
-        # return {"ret": 1}
+        tsp_output = await tsp(input.points)
         t = len(tsp_output)
         for i in range(t):
             start_lng, start_lat = tsp_output[i]["start"][0], tsp_output[i]["start"][1]
@@ -133,8 +132,8 @@ async def save_route(input: TSPinput):
             tsp_output[i]["data"] = tsp_output[i]["data"].dict()
 
         route_id = await add_route_info_row(tsp_output)
-        success = True if route_id is not None else False
-        return {"success": success}
+        success = await update_route_info_id(input.request_id, route_id)
+        return {"success": (True if success is not None and success == input.request_id else False)}
     except Exception as e:
         print(f"Error {e}")
         return {"success": 0}

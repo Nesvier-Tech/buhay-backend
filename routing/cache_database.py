@@ -93,6 +93,17 @@ async def add_route_info_row(route_data: dict):
             )
     return route_id
 
+async def update_route_info_id(request_id: int, route_info_id: int):
+    table = "dispatcher_data"
+    async with connection_pool.acquire() as connection:
+        async with connection.transaction():
+            ret = await connection.fetchval(
+                f"UPDATE {table} SET route_info_id = $1 WHERE request_id = $2 RETURNING request_id;",
+                route_info_id,
+                request_id
+            )
+    return ret
+
 async def route_info(route_id: str):
     table = "route_info"
     async with connection_pool.acquire() as connection:
