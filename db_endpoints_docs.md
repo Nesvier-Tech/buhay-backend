@@ -80,8 +80,8 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
 
 ```JSON
 {
-    "request_id": int (new incremented primary key),
-    "coordinate_names": list[str] (reverse geocoded coordinates),
+    "request_id": int, // (new incremented primary key),
+    "coordinate_names": list[str], // (reverse geocoded coordinates)
     "consituent_id": person_id,
     "route_info_id": null,
     "rescued": false,
@@ -155,4 +155,66 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
     },
     "ongoing": false
 }
+```
+
+# /save_route
+
+Given a starting point `start: Point` and some other points `other_points: List[Point]`, the endpoint inserts a new row that contains the TSP solution for the given points with their safe routes/directions from going point to point into the `route_info` table and then returns a `success: bool`.
+
+**Sample Input**
+```JSON
+{
+  "start": {
+    "coordinates": ["121.0694063","14.65679956"]
+  },
+  "other_points": [
+    {"coordinates": ["121.0411614", "14.66310851"]},
+    {"coordinates": ["121.0219046", "14.65919254"]},
+    {"coordinates": ["121.0177288","14.65537632"]}
+  ]
+}
+```
+
+**Sample Output**
+```JSON
+{"success": true}
+```
+
+**Sample Inserted Row**
+
+*Note: `route_id` is the incremented primary id of the new row. 
+```JSON
+    "route_id": 2,
+    "route_data": {
+        "routes": [
+            {
+                "start": "Chemical Engineering Laboratory, Magsaysay Ave, Diliman, Quezon City, 1101 Metro Manila, Philippines",
+                "end": "145 Rd 2, Quezon City, 1100 Metro Manila, Philippines",
+                "data": {
+                    // Very long data
+                }
+            },
+            {
+                "start": "145 Rd 2, Quezon City, 1100 Metro Manila, Philippines",
+                "end": "M25C+MQJ, 20 Ilocos Sur, Bago Bantay, Lungsod Quezon, 1105 Kalakhang Maynila, Philippines",
+                "data": {
+                    // Very long data
+                }
+            },
+            {
+                "start": "M25C+MQJ, 20 Ilocos Sur, Bago Bantay, Lungsod Quezon, 1105 Kalakhang Maynila, Philippines",
+                "end": "301 San Antonio, Quezon City, Metro Manila, Philippines",
+                "data": {
+                    // Very long
+                }
+            },
+            {
+                "start": "301 San Antonio, Quezon City, Metro Manila, Philippines",
+                "end": "Chemical Engineering Laboratory, Magsaysay Ave, Diliman, Quezon City, 1101 Metro Manila, Philippines",
+                "data": {
+                    // Very long Data
+                }
+            }
+        ]
+    }
 ```
