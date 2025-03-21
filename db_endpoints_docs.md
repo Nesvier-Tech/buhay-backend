@@ -137,7 +137,7 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
     "rescued": false,
     "rescuer_id": null,
     "old_rescuer_id": null,
-    "raw_coordinates: {
+    "raw_coordinates": {
         "raw_coordinates": [
             {
                 "coordinates": [
@@ -153,6 +153,6 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
             }
         ]
     },
-    ongoing: false
+    "ongoing": false
 }
 ```
