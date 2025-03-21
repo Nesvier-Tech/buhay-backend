@@ -14,6 +14,7 @@ from routing.cache_database import (
     close_database_connection,
     search_login,
     add_request_row,
+    add_route_info_row,
     route_info,
     update_rescued_boolean,
 )
@@ -21,6 +22,7 @@ from models import (
     Point, 
     LoginInput, 
     AddRequestInput,
+    TSPinput,
     RouteInfo, 
     UpdateRescued
 )
@@ -28,6 +30,9 @@ from qc_coordinates import check_point_in_polygon
 from own_websocket import own_socket
 from db_env import GOOGLE_MAPS_API
 import googlemaps
+from tsp_endpoint.tsp import tsp
+
+from pprint import pprint
 
 
 # Load the flooded areas on startup
@@ -110,6 +115,29 @@ async def add_request(input: AddRequestInput):
         coordinate_names.append(gmaps.reverse_geocode((lat, lng), result_type="street_address")[0]["formatted_address"])
     request_id = await add_request_row(person_id, raw_coordinates, coordinate_names)
     return {"request_id": request_id}
+
+@app.post("/save_route", status_code=status.HTTP_200_OK)
+async def save_route(input: TSPinput):
+    try:
+        tsp_output = await tsp(input)
+        # print(tsp_output)
+        # return {"ret": 1}
+        t = len(tsp_output)
+        for i in range(t):
+            start_lng, start_lat = tsp_output[i]["start"][0], tsp_output[i]["start"][1]
+            end_lng, end_lat = tsp_output[i]["end"][0], tsp_output[i]["end"][1]
+            start_name = gmaps.reverse_geocode((start_lat, start_lng), result_type="street_address")[0]["formatted_address"]
+            end_name = gmaps.reverse_geocode((end_lat, end_lng), result_type="street_address")[0]["formatted_address"]
+            tsp_output[i]["start"] = start_name
+            tsp_output[i]["end"] = end_name
+            tsp_output[i]["data"] = tsp_output[i]["data"].dict()
+
+        route_id = await add_route_info_row(tsp_output)
+        success = True if route_id is not None else False
+        return {"success": success}
+    except Exception as e:
+        print(f"Error {e}")
+        return {"success": 0}
 
 @app.post("/get_route_info", status_code=status.HTTP_200_OK)
 async def get_route_info(route_id: RouteInfo):

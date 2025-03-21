@@ -11,7 +11,7 @@ from db_env import (
     DB_CACHE_TABLE_NAME,
 )
 
-from models import Point
+from models import Point, TSPOutput
 
 # Global variable for the connection pool
 connection_pool = None
@@ -81,6 +81,17 @@ async def add_request_row(constituent_id: int, raw_coordinates: list[Point], coo
                 json.dumps({"raw_coordinates": raw_coordinates})
             )
     return request_id
+
+# Input is JSON-formatted str
+async def add_route_info_row(route_data: dict):
+    table = "route_info"
+    async with connection_pool.acquire() as connection:
+        async with connection.transaction():
+            route_id = await connection.fetchval(
+                f"INSERT INTO {table} (route_data) VALUES ($1) RETURNING route_id;",
+                json.dumps({"routes": route_data})
+            )
+    return route_id
 
 async def route_info(route_id: str):
     table = "route_info"

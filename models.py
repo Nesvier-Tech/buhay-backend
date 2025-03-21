@@ -37,6 +37,12 @@ class TSPinput(BaseModel):
     other_points: List[Point]
 
 
+class TSPOutput(BaseModel):
+    start: str
+    end: str
+    data: DirectionsResponse
+
+
 class LoginInput(BaseModel):
     username: str
     password: str
