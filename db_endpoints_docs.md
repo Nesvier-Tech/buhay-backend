@@ -95,20 +95,12 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
 **Sample Input**
 ```JSON
 {
-    "person_id": 2,
+    "person_id": 3,
     "coordinates": [
-        {
-            "coordinates": [
-                121.06846773745589,
-                14.648772127025484
-            ]
-        },
-        {
-            "coordinates":[
-                121.05786349512705,
-                14.643245228663027
-            ]
-        }
+        {"coordinates": ["121.0694063","14.65679956"]},
+        {"coordinates": ["121.0411614","14.66310851"]},
+        {"coordinates": ["121.0219046","14.65919254"]},
+        {"coordinates": ["121.0177288","14.65537632"]}
     ]
 }
 ```
@@ -118,39 +110,33 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
 *Note that the returned `request_id` is the incremented primary key of the new row.*
 ```JSON
 {
-    "request_id": 11
+    "request_id": 12
 }
 ```
 
 **Sample Inserted Row**
 ```JSON
 {
-    "request_id": 11,
+    "request_id": 12,
     "coordinate_names": {
         "location_names": [
-            "University of the Philippines Alumni Engineers' Centennial Hall, P. Velasquez Street, Diliman, Quezon City, 1800 Metro Manila, Philippines",
-            "41-B Mapagkawanggawa, Diliman, Lungsod Quezon, 1101 Kalakhang Maynila, Philippines"
+            "Chemical Engineering Laboratory, Magsaysay Ave, Diliman, Quezon City, 1101 Metro Manila, Philippines",
+            "145 Rd 2, Quezon City, 1100 Metro Manila, Philippines",
+            "M25C+MQJ, 20 Ilocos Sur, Bago Bantay, Lungsod Quezon, 1105 Kalakhang Maynila, Philippines",
+            "301 San Antonio, Quezon City, Metro Manila, Philippines"
         ]
-    }, 
-    "constituent_id": 2,
+    },
+    "constituent_id": 3,
     "route_info_id": null,
     "rescued": false,
     "rescuer_id": null,
     "old_rescuer_id": null,
     "raw_coordinates": {
         "raw_coordinates": [
-            {
-                "coordinates": [
-                    121.06846773745589,
-                    14.648772127025484
-                ]
-            },
-            {
-                "coordinates": [
-                    121.05786349512705,
-                    14.643245228663027
-                ]
-            }
+            {"coordinates": [121.0694063, 14.65679956]},
+            {"coordinates": [121.0411614, 14.66310851]},
+            {"coordinates": [121.0219046, 14.65919254]},
+            {"coordinates": [121.0177288, 14.65537632]}
         ]
     },
     "ongoing": false
@@ -159,7 +145,7 @@ Given a `person_id: int` and `coordinates: List[Point]`, the endpoint inserts a 
 
 # /save_route
 
-Given a starting point `start: Point` and some other points `other_points: List[Point]`, the endpoint inserts a new row that contains the TSP solution for the given points with their safe routes/directions from going point to point into the `route_info` table and then returns a `success: bool`.
+The endpoint is given a request ID `request_id: int`, a starting point `start: Point` and some other points `other_points: List[Point]`. A new row that contains the TSP solution for the given points with their safe routes/directions from going point to point is inserted into the `route_info` table with its unique `route_id`. Then, the new `route_id` becomes the `route_info_id` of the row in `dispatcher_data` with `request_id` as its primary key.  
 
 **Sample Input**
 ```JSON
@@ -180,11 +166,11 @@ Given a starting point `start: Point` and some other points `other_points: List[
 {"success": true}
 ```
 
-**Sample Inserted Row**
+**Sample Inserted Row in Route_Info**
 
 *Note: `route_id` is the incremented primary id of the new row. 
 ```JSON
-    "route_id": 2,
+    "route_id": 6,
     "route_data": {
         "routes": [
             {
@@ -217,4 +203,14 @@ Given a starting point `start: Point` and some other points `other_points: List[
             }
         ]
     }
+```
+
+**Sample Updated Row in dispatcher_data**
+```JSON
+{
+    "request_id": 12,
+    // Other Fields remain the same
+    "route_info_id": 6
+    // Other Fields remain the same
+}
 ```
